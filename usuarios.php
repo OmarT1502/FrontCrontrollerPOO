@@ -19,6 +19,16 @@ class usuarios
         } else {
             throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, "Url mal formada", 400);
         }
-    } 
+    }
+
+    private function registrar()
+    {
+        $cuerpo = file_get_contents('php://input');
+        $usuario = json_decode($cuerpo);
+
+        // Validar campos
+        // Crear usuario
+        // Imprimir respuesta
+    }
    
 }

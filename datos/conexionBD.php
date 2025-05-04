@@ -78,5 +78,60 @@ class ConexionBD
     {
         self::$pdo = null;
     }
+
+    private function crear($datosUsuario)
+    {
+        $nombre = $datosUsuario->nombre;
+
+        $contrasena = $datosUsuario->contrasena;
+        $contrasenaEncriptada = self::encriptarContrasena($contrasena);
+
+        $correo = $datosUsuario->correo;
+
+        $claveApi = self::generarClaveApi();
+
+        try {
+
+            $pdo = ConexionBD::obtenerInstancia()->obtenerBD();
+
+            // Sentencia INSERT
+            $comando = "INSERT INTO " . self::NOMBRE_TABLA . " ( " .
+                self::NOMBRE . "," .
+                self::CONTRASENA . "," .
+                self::CLAVE_API . "," .
+                self::CORREO . ")" .
+                " VALUES(?,?,?,?)";
+
+            $sentencia = $pdo->prepare($comando);
+
+            $sentencia->bindParam(1, $nombre);
+            $sentencia->bindParam(2, $contrasenaEncriptada);
+            $sentencia->bindParam(3, $claveApi);
+            $sentencia->bindParam(4, $correo);
+
+            $resultado = $sentencia->execute();
+
+            if ($resultado) {
+                return self::ESTADO_CREACION_EXITOSA;
+            } else {
+                return self::ESTADO_CREACION_FALLIDA;
+            }
+        } catch (PDOException $e) {
+            throw new ExcepcionApi(self::ESTADO_ERROR_BD, $e->getMessage());
+        }
+
+    }
+
+    private function encriptarContrasena($contrasenaPlana)
+    {
+        if ($contrasenaPlana)
+            return password_hash($contrasenaPlana, PASSWORD_DEFAULT);
+        else return null;
+    }
+
+    private function generarClaveApi()
+    {
+        return md5(microtime().rand());
+    }
 }
 ?>
