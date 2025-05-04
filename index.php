@@ -142,7 +142,26 @@ switch ($request_method){
 
 	}
 
-} //switch
+} 
+
+//Manejo de excepciones
+$vista = new VistaJson();
+
+set_exception_handler(function ($exception) use ($vista) {
+    $cuerpo = array(
+        "estado" => $exception->estado,
+        "mensaje" => $exception->getMessage()
+    );
+    if ($exception->getCode()) {
+        $vista->estado = $exception->getCode();
+    } else {
+        $vista->estado = 500;
+    }
+
+    $vista->imprimir($cuerpo);
+}
+);
+//switch
 
 /*
 
